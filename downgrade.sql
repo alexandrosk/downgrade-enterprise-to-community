@@ -645,19 +645,17 @@ DELETE FROM `cataloginventory_stock_item` WHERE `product_id` NOT IN (SELECT `ent
 ALTER TABLE `cataloginventory_stock_item`
     ADD CONSTRAINT `CATINV_STOCK_ITEM_PRD_ID_CAT_PRD_ENTT_ENTT_ID` FOREIGN KEY (`product_id`) REFERENCES `catalog_product_entity` (`entity_id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
-/*ALTER TABLE `product_alert_price`
+ALTER TABLE `product_alert_price`
     ADD CONSTRAINT `PRODUCT_ALERT_PRICE_PRODUCT_ID_CATALOG_PRODUCT_ENTITY_ENTITY_ID` FOREIGN KEY (`product_id`) REFERENCES `catalog_product_entity` (`entity_id`) ON DELETE CASCADE ON UPDATE RESTRICT;*/
 
-/*ALTER TABLE `product_alert_stock`
+ALTER TABLE `product_alert_stock`
     ADD CONSTRAINT `PRODUCT_ALERT_STOCK_PRODUCT_ID_CATALOG_PRODUCT_ENTITY_ENTITY_ID` FOREIGN KEY (`product_id`) REFERENCES `catalog_product_entity` (`entity_id`) ON DELETE CASCADE ON UPDATE RESTRICT;
-*/
-/*ALTER TABLE `report_compared_product_index`
+ALTER TABLE `report_compared_product_index`
     ADD CONSTRAINT `REPORT_CMPD_PRD_IDX_PRD_ID_CAT_PRD_ENTT_ENTT_ID` FOREIGN KEY (`product_id`) REFERENCES `catalog_product_entity` (`entity_id`) ON DELETE CASCADE ON UPDATE RESTRICT;
-*/
-/*ALTER TABLE `report_viewed_product_aggregated_daily`
+ALTER TABLE `report_viewed_product_aggregated_daily`
     ADD CONSTRAINT `REPORT_VIEWED_PRD_AGGRED_DAILY_PRD_ID_CAT_PRD_ENTT_ENTT_ID` FOREIGN KEY (`product_id`) REFERENCES `catalog_product_entity` (`entity_id`) ON DELETE CASCADE ON UPDATE RESTRICT;
-*/
-/*ALTER TABLE `report_viewed_product_aggregated_monthly`
+
+ALTER TABLE `report_viewed_product_aggregated_monthly`
     ADD CONSTRAINT `REPORT_VIEWED_PRD_AGGRED_MONTHLY_PRD_ID_CAT_PRD_ENTT_ENTT_ID` FOREIGN KEY (`product_id`) REFERENCES `catalog_product_entity` (`entity_id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 ALTER TABLE `report_viewed_product_aggregated_yearly`
@@ -672,8 +670,8 @@ ALTER TABLE `weee_tax`
 ALTER TABLE `wishlist_item`
     DROP FOREIGN KEY `WISHLIST_ITEM_PRODUCT_ID_SEQUENCE_PRODUCT_SEQUENCE_VALUE`,
     ADD CONSTRAINT `WISHLIST_ITEM_PRODUCT_ID_CATALOG_PRODUCT_ENTITY_ENTITY_ID` FOREIGN KEY (`product_id`) REFERENCES `catalog_product_entity` (`entity_id`) ON DELETE CASCADE ON UPDATE RESTRICT;
-*/
-# DROP TABLE `sequence_product_bundle_selection`,`sequence_product_bundle_option`,`sequence_product`;
+
+DROP TABLE `sequence_product_bundle_selection`,`sequence_product_bundle_option`,`sequence_product`;
 
 -- Remove EE attributes
 
@@ -739,32 +737,32 @@ DROP TABLE IF EXISTS
 
 -- Enable `rule_id` column for salesrule
 
-# ALTER TABLE `salesrule_customer_group`
-#     ADD COLUMN `rule_id` INT(10) UNSIGNED NOT NULL COMMENT 'Rule ID';
-# ALTER TABLE `salesrule_website`
-#     ADD COLUMN `rule_id` INT(10) UNSIGNED NOT NULL COMMENT 'Rule ID';
-# ALTER TABLE `salesrule_product_attribute`
-#     ADD COLUMN `rule_id` INT(10) UNSIGNED NOT NULL COMMENT 'Rule ID';
+ALTER TABLE `salesrule_customer_group`
+    ADD COLUMN `rule_id` INT(10) UNSIGNED NOT NULL COMMENT 'Rule ID';
+ALTER TABLE `salesrule_website`
+    ADD COLUMN `rule_id` INT(10) UNSIGNED NOT NULL COMMENT 'Rule ID';
+ALTER TABLE `salesrule_product_attribute`
+    ADD COLUMN `rule_id` INT(10) UNSIGNED NOT NULL COMMENT 'Rule ID';
 
 -- Clean duplicates for salesrule
 
-# DELETE e
-# FROM `salesrule` e
-#          LEFT OUTER JOIN (
-#     SELECT MAX(`updated_in`) as `last_updated_in`,`rule_id`
-#     FROM `salesrule`
-#     GROUP BY `rule_id`
-# ) AS p
-#                          ON e.`rule_id` = p.`rule_id` AND e.`updated_in` = p.`last_updated_in`
-# WHERE p.`last_updated_in` IS NULL;
+DELETE e
+FROM `salesrule` e
+         LEFT OUTER JOIN (
+    SELECT MAX(`updated_in`) as `last_updated_in`,`rule_id`
+    FROM `salesrule`
+    GROUP BY `rule_id`
+) AS p
+                         ON e.`rule_id` = p.`rule_id` AND e.`updated_in` = p.`last_updated_in`
+WHERE p.`last_updated_in` IS NULL;
 
 SET FOREIGN_KEY_CHECKS = 0;
 -- Populate `rule_id` column for salesrule
-/*UPDATE salesrule_customer_group SET rule_id = row_id where 1=1;
+UPDATE salesrule_customer_group SET rule_id = row_id where 1=1;
 UPDATE salesrule_website SET rule_id = row_id  where 1=1;
 UPDATE salesrule_product_attribute SET rule_id = row_id  where 1=1;
 UPDATE salesrule SET rule_id = row_id  where 1=1;*/
-/*UPDATE `salesrule_customer_group` v INNER JOIN `salesrule` e ON v.`row_id` = e.`row_id`
+UPDATE `salesrule_customer_group` v INNER JOIN `salesrule` e ON v.`row_id` = e.`row_id`
 SET v.`rule_id` = e.`rule_id`
 WHERE 1;
 UPDATE `salesrule_website` v INNER JOIN `salesrule` e ON v.`row_id` = e.`row_id`
@@ -772,66 +770,66 @@ SET v.`rule_id` = e.`rule_id`
 WHERE 1;
 UPDATE `salesrule_product_attribute` v INNER JOIN `salesrule` e ON v.`row_id` = e.`row_id`
 SET v.`rule_id` = e.`rule_id`
-WHERE 1;*/
+WHERE 1;
 
 -- -----------------------------------------------------
 -- Update the `rule_id` relation link for salesrule --
 -- -----------------------------------------------------
-#
-# -- Customer group
-# ALTER TABLE `salesrule_customer_group`
-#     DROP FOREIGN KEY `SALESRULE_CUSTOMER_GROUP_ROW_ID_SALESRULE_ROW_ID`,
-#     DROP PRIMARY KEY,
-#     ADD PRIMARY KEY (`rule_id`,`customer_group_id`),
-#     DROP COLUMN `row_id`;
-#
-# -- Website
-# ALTER TABLE `salesrule_website`
-#     DROP FOREIGN KEY `SALESRULE_WEBSITE_ROW_ID_SALESRULE_ROW_ID`,
-#     DROP PRIMARY KEY,
-#     ADD PRIMARY KEY (`rule_id`,`website_id`),
-#     DROP COLUMN `row_id`;
-#
-# -- Product Attribute
-# ALTER TABLE `salesrule_product_attribute`
-#     DROP FOREIGN KEY `SALESRULE_PRODUCT_ATTRIBUTE_ROW_ID_SALESRULE_ROW_ID`,
-#     DROP PRIMARY KEY,
-#     ADD PRIMARY KEY (`rule_id`,`website_id`,`customer_group_id`,`attribute_id`),
-#     DROP COLUMN `row_id`;
-#
-# -- Salesrule
-# ALTER TABLE `salesrule`
-#     DROP FOREIGN KEY `SALESRULE_RULE_ID_SEQUENCE_SALESRULE_SEQUENCE_VALUE`;
-# ALTER TABLE `salesrule`
-#     DROP COLUMN `row_id`,
-#     DROP COLUMN `created_in`,
-#     DROP COLUMN `updated_in`,
-#     ADD PRIMARY KEY (`rule_id`),
-#     MODIFY COLUMN `rule_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Entity ID';
-#
-# -- Foreign keys
-# ALTER TABLE `salesrule_customer_group`
-#     ADD CONSTRAINT `SALESRULE_CUSTOMER_GROUP_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `salesrule` (`rule_id`) ON DELETE CASCADE ON UPDATE RESTRICT;
-# ALTER TABLE `salesrule_website`
-#     ADD CONSTRAINT `SALESRULE_WEBSITE_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `salesrule` (`rule_id`) ON DELETE CASCADE ON UPDATE RESTRICT;
-# ALTER TABLE `salesrule_product_attribute`
-#     ADD CONSTRAINT `SALESRULE_PRODUCT_ATTRIBUTE_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `salesrule` (`rule_id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+-- Customer group
+ALTER TABLE `salesrule_customer_group`
+    DROP FOREIGN KEY `SALESRULE_CUSTOMER_GROUP_ROW_ID_SALESRULE_ROW_ID`,
+    DROP PRIMARY KEY,
+    ADD PRIMARY KEY (`rule_id`,`customer_group_id`),
+    DROP COLUMN `row_id`;
+
+-- Website
+ALTER TABLE `salesrule_website`
+    DROP FOREIGN KEY `SALESRULE_WEBSITE_ROW_ID_SALESRULE_ROW_ID`,
+    DROP PRIMARY KEY,
+    ADD PRIMARY KEY (`rule_id`,`website_id`),
+    DROP COLUMN `row_id`;
+
+-- Product Attribute
+ALTER TABLE `salesrule_product_attribute`
+    DROP FOREIGN KEY `SALESRULE_PRODUCT_ATTRIBUTE_ROW_ID_SALESRULE_ROW_ID`,
+    DROP PRIMARY KEY,
+    ADD PRIMARY KEY (`rule_id`,`website_id`,`customer_group_id`,`attribute_id`),
+    DROP COLUMN `row_id`;
+
+-- Salesrule
+ALTER TABLE `salesrule`
+    DROP FOREIGN KEY `SALESRULE_RULE_ID_SEQUENCE_SALESRULE_SEQUENCE_VALUE`;
+ALTER TABLE `salesrule`
+    DROP COLUMN `row_id`,
+    DROP COLUMN `created_in`,
+    DROP COLUMN `updated_in`,
+    ADD PRIMARY KEY (`rule_id`),
+    MODIFY COLUMN `rule_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Entity ID';
+
+-- Foreign keys
+ALTER TABLE `salesrule_customer_group`
+    ADD CONSTRAINT `SALESRULE_CUSTOMER_GROUP_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `salesrule` (`rule_id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `salesrule_website`
+    ADD CONSTRAINT `SALESRULE_WEBSITE_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `salesrule` (`rule_id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `salesrule_product_attribute`
+    ADD CONSTRAINT `SALESRULE_PRODUCT_ATTRIBUTE_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `salesrule` (`rule_id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 -- ----------------
 -- Drop sequence --
 -- ----------------
 
-# ALTER TABLE `salesrule_coupon`
-#     DROP FOREIGN KEY `SALESRULE_COUPON_RULE_ID_SEQUENCE_SALESRULE_SEQUENCE_VALUE`,
-#     ADD CONSTRAINT `SALESRULE_COUPON_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `salesrule` (`rule_id`);
-# ALTER TABLE `salesrule_customer`
-#     DROP FOREIGN KEY `SALESRULE_CUSTOMER_RULE_ID_SEQUENCE_SALESRULE_SEQUENCE_VALUE`,
-#     ADD CONSTRAINT `SALESRULE_CUSTOMER_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `salesrule` (`rule_id`);
-# ALTER TABLE `salesrule_label`
-#     DROP FOREIGN KEY `SALESRULE_LABEL_RULE_ID_SEQUENCE_SALESRULE_SEQUENCE_VALUE`,
-#     ADD CONSTRAINT `SALESRULE_LABEL_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `salesrule` (`rule_id`);
-#
-# DROP TABLE `sequence_salesrule`;
+ALTER TABLE `salesrule_coupon`
+    DROP FOREIGN KEY `SALESRULE_COUPON_RULE_ID_SEQUENCE_SALESRULE_SEQUENCE_VALUE`,
+    ADD CONSTRAINT `SALESRULE_COUPON_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `salesrule` (`rule_id`);
+ALTER TABLE `salesrule_customer`
+    DROP FOREIGN KEY `SALESRULE_CUSTOMER_RULE_ID_SEQUENCE_SALESRULE_SEQUENCE_VALUE`,
+    ADD CONSTRAINT `SALESRULE_CUSTOMER_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `salesrule` (`rule_id`);
+ALTER TABLE `salesrule_label`
+    DROP FOREIGN KEY `SALESRULE_LABEL_RULE_ID_SEQUENCE_SALESRULE_SEQUENCE_VALUE`,
+    ADD CONSTRAINT `SALESRULE_LABEL_RULE_ID_SALESRULE_RULE_ID` FOREIGN KEY (`rule_id`) REFERENCES `salesrule` (`rule_id`);
+
+#DROP TABLE `sequence_salesrule`;
 
 -- Enable `rule_id` column for catalogrule
 
@@ -898,7 +896,7 @@ ALTER TABLE `catalogrule_website`
 -- Drop sequence --
 -- ----------------
 
-# DROP TABLE `sequence_catalogrule`;
+DROP TABLE `sequence_catalogrule`;
 
 -- Enable `entity_id` column for catalog category entity
 
@@ -1013,9 +1011,9 @@ ALTER TABLE `catalog_category_product`
 ALTER TABLE `catalog_url_rewrite_product_category`
     ADD CONSTRAINT `CAT_URL_REWRITE_PRD_CTGR_CTGR_ID_CAT_CTGR_ENTT_ENTT_ID` FOREIGN KEY (`category_id`) REFERENCES `catalog_category_entity` (`entity_id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
-#DROP TABLE `sequence_catalog_category`;
+DROP TABLE `sequence_catalog_category`;
 
 ALTER TABLE `catalog_product_entity_media_gallery_value` DROP INDEX `CAT_PRD_ENTT_MDA_GLR_VAL_ENTT_ID_VAL_ID_STORE_ID`;
-#ALTER TABLE `wishlist` DROP FOREIGN KEY `WISHLIST_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID`, DROP INDEX `WISHLIST_CUSTOMER_ID`
+ALTER TABLE `wishlist` DROP FOREIGN KEY `WISHLIST_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID`, DROP INDEX `WISHLIST_CUSTOMER_ID`
 
 /*!40101 SET character_set_client = @saved_cs_client */;
